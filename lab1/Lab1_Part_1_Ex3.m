@@ -3,7 +3,7 @@ clc;clear all;
 %Reading data from a file
 %Note that time is in micro seconds and packetsize is in Bytes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[packet_no_p, time_p, packetsize_p] = textread('poisson1.data', '%f %f %f');
+[packet_no_p, time_p, packetsize_p] = textread('poisson3.data', '%f %f %f');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%Exercise 1.2%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %The following code will generate Plot 1; You generate Plot2 , Plot3.
@@ -30,8 +30,8 @@ jj=jj+1;
 end
 i=i+1;
 end
-avg_1_1_1 = mean(bytes_p);
-var_1_1_1 = var(bytes_p);
+avg_1_3_1 = mean(bytes_p);
+var_1_3_1 = var(bytes_p);
 
 %%%%%%%%
 subplot(3,1,1);bar(bytes_p);
@@ -61,8 +61,8 @@ jj=jj+1;
 end
 i=i+1;
 end
-avg_1_1_2 = mean(bytes_p);
-var_1_1_2 = var(bytes_p);
+avg_1_3_2 = mean(bytes_p);
+var_1_3_2 = var(bytes_p);
 
 %%%%%%%%
 subplot(3,1,2);bar(bytes_p);
@@ -86,8 +86,8 @@ jj=jj+1;
 end
 i=i+1;
 end
-avg_1_1_3 = mean(bytes_p);
-var_1_1_3 = var(bytes_p);
+avg_1_3_3 = mean(bytes_p);
+var_1_3_3 = var(bytes_p);
 
 %%%%%%%%
 subplot(3,1,3);bar(bytes_p);
