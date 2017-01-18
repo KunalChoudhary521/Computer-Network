@@ -78,6 +78,18 @@ peak_bit_rate = max_framsize / max_frame_idx;   %not sure about this
 
 peak_to_avg_rate = peak_bit_rate / mean_bit_rate;   %mean is average
 
+figure(1);  %creates a separate window of graphs for part 2.2
+subplot(3,1,1);
+bar(index, framesize_f);   %should framesizes be shown as bars (similar to lab1_part1)?
+title('Video Trace - Packet Traffic');
+xlabel('Frame Sequence Numbers');
+ylabel('Frame Size (Bytes)');
+
+subplot(3,1,2);
+
+title('Distribution of I, B & P frames');
+xlabel('Frame Size (Bytes)');
+ylabel('Relative Frequency');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   CODE FOR EXERCISE 2.3   (version: Spring 2007)
@@ -105,4 +117,44 @@ end
 i=i+1;
 end
 subplot(3,1,1);bar(bytes_f);
+title('Video Trace @ 500 fFrame Interval');
+xlabel('500 Frames per element');
+ylabel('Frame Size (Bytes)');
+
+% Plot 2
+initial_point=3000;
+ag_frame=50;
+jj=initial_point;
+i=1;
+bytes_f=zeros(1,100);
+while i<=100
+while ((jj-initial_point)<=ag_frame*i && jj<length(framesize_f))
+bytes_f(i)=bytes_f(i)+framesize_f(jj);
+jj=jj+1;
+end
+i=i+1;
+end
+subplot(3,1,2);bar(bytes_f);
+title('Video Trace @ 50 fFrame Interval');
+xlabel('50 Frames per element');
+ylabel('Frame Size (Bytes)');
+
+
+% Plot 3
+initial_point=5010;
+ag_frame=5;
+jj=initial_point;
+i=1;
+bytes_f=zeros(1,100);
+while i<=100
+while ((jj-initial_point)<=ag_frame*i && jj<length(framesize_f))
+bytes_f(i)=bytes_f(i)+framesize_f(jj);
+jj=jj+1;
+end
+i=i+1;
+end
+subplot(3,1,3);bar(bytes_f);
+title('Video Trace @ 5 fFrame Interval');
+xlabel('5 Frames per element');
+ylabel('Frame Size (Bytes)');
 
