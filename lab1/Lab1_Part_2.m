@@ -58,6 +58,25 @@ end
 %       that function type 'figure(2);' to indicate your figure number.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Exercise 2.2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+total_frames = max(index);
+
+total_bytes = sum(framesize_f);
+
+smallest_frame = min(framesize_f);
+
+largest_frame = max(framesize_f);
+
+mean_I = mean(framesize_I);
+mean_B = mean(framesize_B);
+mean_P = mean(framesize_P);
+
+mean_bit_rate = mean(framesize_f) / sum(time);  %not sure about this
+
+[max_framsize, max_frame_idx] = max(framesize_f);
+peak_bit_rate = max_framsize / max_frame_idx;   %not sure about this
+
+peak_to_avg_rate = peak_bit_rate / mean_bit_rate;   %mean is average
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
