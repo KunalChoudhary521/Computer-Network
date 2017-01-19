@@ -1,6 +1,6 @@
 clc;clear all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Reading the data and putting the first 100000 entries in variables 
+%Reading the data for the WHOLE data set
 %Note that time is in seconds and framesize is in Bytes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [time1, framesize1] = textread('BC-pAug89.Tl', '%f %f');
