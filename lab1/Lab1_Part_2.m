@@ -59,35 +59,56 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Exercise 2.2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-total_frames = max(index);
+total_frames = length(index);
 
 total_bytes = sum(framesize_f);
 
 smallest_frame = min(framesize_f);
-
 largest_frame = max(framesize_f);
+mean_framesize = total_bytes / total_frames;
 
-mean_I = mean(framesize_I);
-mean_B = mean(framesize_B);
-mean_P = mean(framesize_P);
+smallest_Iframe = min(framesize_I);
+largest_Iframe = max(framesize_I);
+mean_Iframe = mean(framesize_I);
+
+smallest_Bframe = min(framesize_B);
+largest_Bframe = max(framesize_B);
+mean_Bframe = mean(framesize_B);
+
+smallest_Pframe = min(framesize_P);
+largest_Pframe = max(framesize_P);
+mean_Pframe = mean(framesize_P);
 
 mean_bit_rate = mean(framesize_f) / sum(time);  %not sure about this
 
 [max_framsize, max_frame_idx] = max(framesize_f);
 peak_bit_rate = max_framsize / max_frame_idx;   %not sure about this
 
-peak_to_avg_rate = peak_bit_rate / mean_bit_rate;   %mean is average
+peak_to_avg_ratio = peak_bit_rate / mean_bit_rate;   %mean is average
 
 figure(1);  %creates a separate window of graphs for part 2.2
-subplot(3,1,1);
+%subplot(3,1,1);
 bar(index, framesize_f);   %should framesizes be shown as bars (similar to lab1_part1)?
 title('Video Trace - Packet Traffic');
 xlabel('Frame Sequence Numbers');
 ylabel('Frame Size (Bytes)');
 
-subplot(3,1,2);
+figure(2);
+subplot(3,1,1);
+hist(framesize_I,length(framesize_I));	%is this correct?
+title('Distribution of I frames');
+xlabel('Frame Size (Bytes)');
+ylabel('Relative Frequency');
 
-title('Distribution of I, B & P frames');
+subplot(3,1,2);
+hist(framesize_B,length(framesize_B));	%is this correct?
+title('Distribution of B frames');
+xlabel('Frame Size (Bytes)');
+ylabel('Relative Frequency');
+
+subplot(3,1,3);
+hist(framesize_P,length(framesize_P));	%is this correct?
+title('Distribution of P frames');
 xlabel('Frame Size (Bytes)');
 ylabel('Relative Frequency');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
