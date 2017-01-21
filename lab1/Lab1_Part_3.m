@@ -3,7 +3,7 @@ clc;clear all;
 %Reading the data for the WHOLE data set
 %Note that time is in seconds and framesize is in Bytes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[time1, framesize1] = textread('BC-pAug89.Tl', '%f %f');
+[time1, framesize1] = textread('BC-pAug89.TL', '%f %f');
 no_entries = length(time1);
 time=time1(1:no_entries);
 framesize=framesize1(1:no_entries);
@@ -11,19 +11,19 @@ framesize=framesize1(1:no_entries);
 %%%%%%%%%%%%%%%%%%%%%%%%%Exercise %%%3.2%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-figure();
+figure(1);
 subplot(2,1,1); plot(time, framesize);
 xlabel('Time')
 ylabel('Packet Size in Bytes')
 
-subplot(2,1,2); hist(framesize, length(framesize));
+subplot(2,1,2); hist(framesize, 15);%reduce # of bins(2nd arg)
 xlabel('Frame Size')
 ylabel('Frame Count')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%Exercise %%%3.3%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %The following code will generate Plot 1; You generate Plot2 , Plot3.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure();
+figure(2);
 jj=1;
 i=1;
 initial_p=0;
@@ -88,7 +88,9 @@ while i<=100
     i=i+1;
 end
 
-subplot(3,1,2);bar(bytes_p);
+t_p2 = [20:0.1:30-0.1];
+subplot(3,1,2);bar(t_p2, bytes_p);
+xlim([20 32]);
 title('Bytes Arrived in 100ms Intervals');
 xlabel('Interval Number');
 ylabel('Number of Bytes Arrived');
@@ -114,7 +116,10 @@ while i<=100
     end
     i=i+1;
 end
-subplot(3,1,3);bar(bytes_p);
+
+t_p3 = [90:0.01:91-0.01];
+subplot(3,1,3);bar(t_p3, bytes_p);
+xlim([90 91.2]);
 title('Bytes Arrived in 10ms Intervals');
 xlabel('Interval Number');
 ylabel('Number of Bytes Arrived');

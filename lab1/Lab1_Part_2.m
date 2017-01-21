@@ -79,35 +79,36 @@ smallest_Pframe = min(framesize_P);
 largest_Pframe = max(framesize_P);
 mean_Pframe = mean(framesize_P);
 
-mean_bit_rate = mean(framesize_f) / sum(time);  %not sure about this
+frame_duration = (1/30); %because fps = 30, so frame duration is the inverse of that
+mean_bit_rate = mean(framesize_f * 8) / frame_duration;  
 
-[max_framsize, max_frame_idx] = max(framesize_f);
-peak_bit_rate = max_framsize / max_frame_idx;   %not sure about this
+peak_bit_rate = max(framesize_f * 8) / frame_duration;  
 
 peak_to_avg_ratio = peak_bit_rate / mean_bit_rate;   %mean is average
 
 figure(1);  %creates a separate window of graphs for part 2.2
 %subplot(3,1,1);
-bar(index, framesize_f);   %should framesizes be shown as bars (similar to lab1_part1)?
+plot(index, framesize_f);   %use plot
 title('Video Trace - Packet Traffic');
 xlabel('Frame Sequence Numbers');
 ylabel('Frame Size (Bytes)');
 
+hist_bins = 15;
 figure(2);
 subplot(3,1,1);
-hist(framesize_I,length(framesize_I));	%is this correct?
+hist(framesize_I, hist_bins);	%use small # of bins (2nd argument) so it is easier to view results in the report
 title('Distribution of I frames');
 xlabel('Frame Size (Bytes)');
 ylabel('Relative Frequency');
 
 subplot(3,1,2);
-hist(framesize_B,length(framesize_B));	%is this correct?
+hist(framesize_B,hist_bins);	
 title('Distribution of B frames');
 xlabel('Frame Size (Bytes)');
 ylabel('Relative Frequency');
 
 subplot(3,1,3);
-hist(framesize_P,length(framesize_P));	%is this correct?
+hist(framesize_P,hist_bins);
 title('Distribution of P frames');
 xlabel('Frame Size (Bytes)');
 ylabel('Relative Frequency');
@@ -137,8 +138,11 @@ jj=jj+1;
 end
 i=i+1;
 end
-subplot(3,1,1);bar(bytes_f);
-title('Video Trace @ 500 fFrame Interval');
+
+f_per_ele1 = [1:500:5e4];
+subplot(3,1,1);bar(f_per_ele1, bytes_f);
+xlim([1 6e4]);  
+title('Video Trace @ 500 Frame Interval');
 xlabel('500 Frames per element');
 ylabel('Frame Size (Bytes)');
 
@@ -155,8 +159,12 @@ jj=jj+1;
 end
 i=i+1;
 end
-subplot(3,1,2);bar(bytes_f);
-title('Video Trace @ 50 fFrame Interval');
+
+
+f_per_ele2 = [3000:50:8000-50];
+subplot(3,1,2);bar(f_per_ele2 ,bytes_f);
+xlim([3000 9000]);
+title('Video Trace @ 50 Frame Interval');
 xlabel('50 Frames per element');
 ylabel('Frame Size (Bytes)');
 
@@ -174,8 +182,11 @@ jj=jj+1;
 end
 i=i+1;
 end
-subplot(3,1,3);bar(bytes_f);
-title('Video Trace @ 5 fFrame Interval');
+
+f_per_ele3 = [5010:5:5510-5];
+subplot(3,1,3);bar(f_per_ele3 , bytes_f);
+xlim([5000 5600]);
+title('Video Trace @ 5 Frame Interval');
 xlabel('5 Frames per element');
 ylabel('Frame Size (Bytes)');
 
