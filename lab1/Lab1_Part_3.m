@@ -30,21 +30,12 @@ initial_p=0;
 ag_time=1;
 bytes_p=zeros(1,100);
 
-current_bit_rate = 0;
-peak_bit_rate = 0;
-
 while time(jj)<=initial_p
     jj=jj+1;    
 end
 
 while i<=100
-    while ((time(jj)-initial_p)<=ag_time*i && jj<no_entries)  
-        if jj > 1
-            current_bit_rate = (framesize(jj) * 8) / (time(jj) - time(jj-1));
-            if current_bit_rate > peak_bit_rate
-                peak_bit_rate = current_bit_rate;
-            end
-        end
+    while ((time(jj)-initial_p)<=ag_time*i && jj<no_entries)        
         bytes_p(i)=bytes_p(i)+framesize(jj);
         jj=jj+1;
     end
@@ -63,7 +54,14 @@ total_bytes = sum(framesize)
 total_time = time(end) - time(1);
 
 mean_bit_rate = (total_bytes * 8) / total_time
-peak_bit_rate
+
+current_bit_rate = zeros(1,total_packets);
+while i <= total_packets
+    current_bit_rate(i) = framesize1(i)*8/(time1(i) - time1(i-1));
+    i = i + 1;
+end
+peak_bit_rate = max(current_bit_rate);
+
 
 peak_to_average_ratio = peak_bit_rate / mean_bit_rate
 
