@@ -3,6 +3,6 @@
 *.iml
 
 #lab2a ignores
-lab2a/part1/.idea/*
-lab2a/part1/out/*
+lab2a/*/.idea/*
+lab2a/*/out/*
 lab2a/part1/output.txt
