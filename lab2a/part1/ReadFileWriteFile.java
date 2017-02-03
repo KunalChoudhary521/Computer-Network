@@ -24,7 +24,7 @@ class ReadFileWriteFile {
 			/*
 			 * Open input file as a BufferedReader
 			 */ 
-			File fin = new File("data.txt"); 
+			File fin = new File("movietrace.data");
 			FileReader fis = new FileReader(fin);  
 			bis = new BufferedReader(fis);  
 			
@@ -36,8 +36,12 @@ class ReadFileWriteFile {
 			/*
 			 *  Read file line-by-line until the end of the file 
 			 */
-			while ( (currentLine = bis.readLine()) != null) { 
-				
+
+			int totalIframes = 0, iFrameSize = 0,
+				totalBframes = 0, bFrameSize = 0,
+				totalPframes = 0, pFrameSize = 0;
+			while ( (currentLine = bis.readLine()) != null) 
+			{ 				
 				/*
 				 *  Parse line and break up into elements 
 				 */
@@ -64,13 +68,33 @@ class ReadFileWriteFile {
 				System.out.println("Frame type:        " + Ftype); 
 				System.out.println("Frame size:       " + Fsize + "\n"); 
 				
+				if(Ftype.equals("I"))
+				{
+					totalIframes++;
+					iFrameSize += Fsize;
+				}
+				else if(Ftype.equals("B"))
+				{
+					totalBframes++;
+					bFrameSize += Fsize;
+				}
+				else if(Ftype.equals("P"))
+				{
+					totalPframes++;
+					pFrameSize += Fsize;
+				}
 				
 				/*
 				 *  Write line to output file 
 				 */
 				pout.println(SeqNo+ "\t"+  Ftime + "\t" + Ftype + "\t" + Fsize); 
 				
-			} 
+			}
+
+			System.out.println("Average I frame size: " + iFrameSize/totalIframes);
+			System.out.println("Average P frame size: " + pFrameSize/totalPframes);
+			System.out.println("Average B frame size: " + bFrameSize/totalBframes);
+
 		} catch (IOException e) {  
 			// catch io errors from FileInputStream or readLine()  
 			System.out.println("IOException: " + e.getMessage());  

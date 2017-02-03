@@ -2,6 +2,9 @@ import java.io.*;
 import java.net.*;
 public class Receiver {
   public static void main(String[] args) throws IOException {
+	
+	System.out.println("Recever IP: " + InetAddress.getLocalHost().getHostAddress());
+
     DatagramSocket socket = new DatagramSocket(4444);
     byte[] buf = new byte[256];
     DatagramPacket p = new DatagramPacket(buf, buf.length);
