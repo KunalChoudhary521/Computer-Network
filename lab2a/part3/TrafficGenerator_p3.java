@@ -1,21 +1,21 @@
-package part2;
+package part3;
 
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.sql.SQLClientInfoException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.StringTokenizer;
 
-public class TrafficGenerator
+public class TrafficGenerator_p3
 {
-    public static ArrayList<DataLine> dataList;
+    public static ArrayList<DataLine_p3> dataList;
 
 
     public static void makeUdpPackets(String inFile, String recvHost, int port)
     {
         BufferedReader bfReader = null;
-        BufferedWriter bfWriter = null;
 
         String currentLine;
         StringTokenizer st = null;
@@ -27,13 +27,8 @@ public class TrafficGenerator
             InetAddress sendIP = InetAddress.getByName(recvHost);
 
             File fin = new File(inFile);
-            File fout = new File("poisson3_cumulated_arrivals.data");
 
             FileReader fis = new FileReader(fin);
-            FileWriter fos = new FileWriter(fout);
-
-            bfWriter = new BufferedWriter(fos);
-
             bfReader = new BufferedReader(fis);
 
             String col1,col2,col3;
@@ -54,11 +49,7 @@ public class TrafficGenerator
 
                 cumulatedArrivals += frameSize;
 
-                String line = SeqNo+"\t\t"+0+"\t\t"+cumulatedArrivals;
-                bfWriter.write(line);
-                bfWriter.newLine();
-
-                dataList.add(new DataLine(SeqNo,delayinNs, frameSize,
+                dataList.add(new DataLine_p3(SeqNo,delayinNs, frameSize,
                         new DatagramPacket(new byte[frameSize],frameSize,sendIP,port)));
             }
 
@@ -78,12 +69,9 @@ public class TrafficGenerator
                 prevTime = nextTime;
 
                 cumulatedArrivals += frameSize;
-                String line = SeqNo+"\t\t"+nextTime+"\t\t"+cumulatedArrivals;
-                bfWriter.write(line);
-                bfWriter.newLine();
 
                 //adds dataLine to the end of dataList
-                dataList.add(new DataLine(SeqNo, delayinNs, frameSize,
+                dataList.add(new DataLine_p3(SeqNo, delayinNs, frameSize,
                         new DatagramPacket(new byte[frameSize],frameSize,sendIP,port)));
             }
         }
@@ -101,13 +89,6 @@ public class TrafficGenerator
                     System.out.println("IOException: " +  e.getMessage());
                 }
             }
-            if (bfWriter != null) {
-                try {
-                    bfWriter.close();
-                } catch (IOException e) {
-                    System.out.println("IOException: " +  e.getMessage());
-                }
-            }
         }
     }
     public static void sendUdpPackets()
@@ -115,9 +96,12 @@ public class TrafficGenerator
         try {
             DatagramSocket sendSocket = new DatagramSocket();
             long prevPktSendTime = System.nanoTime(), waitTime, sendTime, currTime,deltaT;
+            File fout = new File("poisson3_cumulated_arrivals.data");
+            FileWriter fos = new FileWriter(fout);
+            BufferedWriter bfWriter = new BufferedWriter(fos);
 
             sendSocket.send(dataList.get(0).udpPacket);//1st packet without delay
-
+            long cumulatedBytes = 0;
             int i;
             for (i = 1; i < dataList.size(); i++)
             {
@@ -137,9 +121,14 @@ public class TrafficGenerator
                 }*/
                 //prevPktSendTime = currTime;
                 sendSocket.send(dataList.get(i).udpPacket);
+                cumulatedBytes+= dataList.get(i).packetSize;
+                bfWriter.write(cumulatedBytes+"\t\t\t"+currTime);
+                bfWriter.newLine();
             }
             System.out.println(i + " packets sent!");
             sendSocket.close();
+            bfWriter.flush();
+            bfWriter.close();
         }
         catch(IOException ex)
         {

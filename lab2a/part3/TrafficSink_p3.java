@@ -1,12 +1,13 @@
-package part2;
+package part3;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Date;
 
-public class TrafficSink
+public class TrafficSink_p3
 {
     public static void main (String[] args)
     {
@@ -52,11 +53,12 @@ public class TrafficSink
                 else
                 {
                     timeDiff = 0;
+                    recvTraffic.printf(currTime+"\n");
                 }
                 currTime = packetRecvTime;
 
                 sequenceNumbers[i] = ""+currSeqNo;
-                arrivals[i] = ""+timeDiff;
+                arrivals[i] = ""+new Date().getTime();
                 packetSize[i] = ""+recvPacket.getLength();
 
                 currSeqNo++;
@@ -64,14 +66,14 @@ public class TrafficSink
             }
             long cumulatedPackets = 0;
             long cumulatedArrivals = 0;
+
             for(i = 0; i< 10000;i++){
                 cumulatedPackets += Long.parseLong(packetSize[i]);
                 cumulatedArrivals += Long.parseLong(arrivals[i]);
-                recvTraffic.printf("%-7s %-7s %s\n",
-                        sequenceNumbers[i], arrivals[i], packetSize[i]);
+                recvTraffic.printf(cumulatedPackets+"\t\t\t"+System.nanoTime()+"\n");
 
-                cumulatedTraffic.printf("%-7s %-7s %s\n",
-                        sequenceNumbers[i], cumulatedArrivals, cumulatedPackets);
+                //cumulatedTraffic.printf("%-7s %-7s %s\n",
+                        //sequenceNumbers[i], cumulatedArrivals, cumulatedPackets);
             }
 
             System.out.println(currSeqNo + " packets received!");

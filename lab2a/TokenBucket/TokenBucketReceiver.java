@@ -57,7 +57,10 @@ public class TokenBucketReceiver implements Runnable
 			long previsuTime = 0;
 			
 			socket = new DatagramSocket(port);
-			
+
+			int cumulatedBytes = 0;
+			int cumulatedTime = 0;
+
 			// receive and put packets in buffer (or send immediately)
 			while (true)
 			{
@@ -74,10 +77,14 @@ public class TokenBucketReceiver implements Runnable
 				if(previsuTime == 0)
 				{
 					previsuTime = time;
+					pOut.println(System.nanoTime());
 				}
 				int noTokens = bucket.getNoTokens();
 				long bufferSize = buffer.getSizeInBytes();
-				pOut.println((time-previsuTime)/1000 + "\t" + packet.getLength() + "\t" + bufferSize + "\t" + noTokens);
+				String space = "                "; //16 spaces
+				cumulatedBytes += packet.getLength();
+				cumulatedTime += (time-previsuTime);
+				pOut.println(cumulatedBytes+"\t\t\t"+System.nanoTime());
 				previsuTime = time;
 				
 				/*
