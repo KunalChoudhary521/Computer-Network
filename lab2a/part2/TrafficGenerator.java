@@ -1,10 +1,9 @@
-package part2;
+//package part2;
 
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.sql.SQLClientInfoException;
 import java.util.*;
 
 public class TrafficGenerator
@@ -183,7 +182,7 @@ public class TrafficGenerator
         for (int i = 0; i < dataList.size(); i++)
         {
             debugOut.printf("%-7s %-7s %s\n",
-                    dataList.get(i).SeqNo, dataList.get(i).delayInNs,
+                    dataList.get(i).SeqNo, dataList.get(i).delayInNs/1000,
                     dataList.get(i).packetSize);
         }
     }
