@@ -1,4 +1,4 @@
-package part2;
+//package part2;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -20,10 +20,10 @@ public class TrafficSink
         PrintStream recvTraffic = null;
         PrintStream cumulatedTraffic = null;
 
-        int recvPort = 50001;//use the same port as in TrafficGenerator.java
-        byte[] recvBuf = new byte[1024];//no size is close to this in poisson3.data
+        int recvPort = 50000;//use the same port as in TrafficGenerator.java
+        byte[] recvBuf = new byte[1500];//no size is close to this in poisson3.data
 
-        int currSeqNo = 1, recvLimit = 10000;
+        int currSeqNo = 0, recvLimit = 10000;
 
         try
         {
