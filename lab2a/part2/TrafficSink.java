@@ -27,7 +27,7 @@ public class TrafficSink
 
         try
         {
-            System.out.println( "Running at: " + InetAddress.getByName("localhost"));
+            //System.out.println( "Running at: " + InetAddress.getByName("localhost"));
             DatagramSocket recvSocket = new DatagramSocket(recvPort);
             DatagramPacket recvPacket = new DatagramPacket(recvBuf,recvBuf.length);
             FileOutputStream fout = new FileOutputStream(outputFile);
@@ -42,6 +42,7 @@ public class TrafficSink
 
             while(currSeqNo <= recvLimit)
             {
+                recvSocket.setSoTimeout(10000);//receiver closes (milliseconds)
                 recvSocket.receive(recvPacket);
 
 				packetRecvTime = System.nanoTime();
@@ -59,33 +60,38 @@ public class TrafficSink
                 arrivals[i] = ""+timeDiff;
                 packetSize[i] = ""+recvPacket.getLength();
 
+                System.out.println("Packet " + currSeqNo + " received");
                 currSeqNo++;
                 i++;
             }
-            long cumulatedPackets = 0;
-            long cumulatedArrivals = 0;
-            for(i = 0; i< 10000;i++){
-                cumulatedPackets += Long.parseLong(packetSize[i]);
-                cumulatedArrivals += Long.parseLong(arrivals[i]);
-                recvTraffic.printf("%-7s %-7s %s\n",
-                        sequenceNumbers[i], arrivals[i], packetSize[i]);
 
-                cumulatedTraffic.printf("%-7s %-7s %s\n",
-                        sequenceNumbers[i], cumulatedArrivals, cumulatedPackets);
-            }
-
+            printPacketsToFile(currSeqNo,sequenceNumbers,packetSize,arrivals,recvTraffic,cumulatedTraffic);
             System.out.println(currSeqNo + " packets received!");
             recvTraffic.close();
         }
         catch(Exception ex)
         {
             System.out.println(ex.getMessage());
+            printPacketsToFile(currSeqNo,sequenceNumbers,packetSize,arrivals,recvTraffic,cumulatedTraffic);
             if(recvTraffic != null)
             {
                 recvTraffic.close();
             }
         }
-        recvTraffic.close();
     }
 
+    public static void printPacketsToFile(int packetsRecv, String[] seqNum,String[] pSize, String[] arrv,PrintStream recvT, PrintStream culTraffic )
+    {
+        long cumulatedPackets = 0;
+        long cumulatedArrivals = 0;
+        for(int i = 0; i< packetsRecv;i++){
+            cumulatedPackets += Long.parseLong(pSize[i]);
+            cumulatedArrivals += Long.parseLong(arrv[i]);
+            recvT.printf("%-7s %-7s %s\n",
+                    seqNum[i], arrv[i], pSize[i]);
+
+            culTraffic.printf("%-7s %-7s %s\n",
+                    seqNum[i], cumulatedArrivals, cumulatedPackets);
+        }
+    }
 }
