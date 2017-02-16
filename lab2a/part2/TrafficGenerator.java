@@ -160,6 +160,8 @@ public class TrafficGenerator
         {
             System.out.println("Provide recevier's IP as cmd-line arg");
         }
+
+        System.out.println("Recevier IP: " + sendhost);
         makeUdpPackets(inputFile,sendhost,sendPort);
 
         //printToFile(debugFile);//output SeqNo & Time to file (for debugging only)
