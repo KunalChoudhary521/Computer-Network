@@ -83,11 +83,11 @@ ylabel('Packet (bytes)');
 %Shows contents of token bucket and buffer backlog as a function of time
 figure(3);
 subplot(2,1,1);
-fig3 = plot(time_bucket,bucket_arrival,'r',time_bucket,buffer_bk_log,'b');
+fig3 = plot(time_bucket,tokens,'r',time_bucket,buffer_bk_log,'b');
 hold on;
 legend(fig3,'Token Bucket', 'Back Log');
 title('Token Bucket & Backlog');
 xlabel('time (ms)');
 ylabel('Packet (bytes)');
-ylim([-0.5* max(bucket_arrival) 1.3*max(bucket_arrival)]);
+ylim([-0.5* max(tokens) 1.3*max(tokens)]);
 

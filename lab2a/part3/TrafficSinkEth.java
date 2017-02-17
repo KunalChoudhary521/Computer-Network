@@ -22,12 +22,14 @@ class TrafficSinkEth
             FileOutputStream fout = new FileOutputStream(outputFile);
             recvTraffic = new PrintStream(fout);
 
-            System.out.println("Traffic Sink Waiting ...");
+            int timeoutWindow = 10000;//in ms
+            System.out.println("Traffic Sink Times out in " + timeoutWindow + "ms ...");
 
             double currTime, packetRecvTime, timeDiff;
 
             while(currSeqNo < recvLimit)
             {
+                recvSocket.setSoTimeout(timeoutWindow);//receiver closes (milliseconds)
                 currTime = System.nanoTime();
                 recvSocket.receive(recvPacket);
 
