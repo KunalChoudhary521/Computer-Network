@@ -19,7 +19,7 @@ class TrafficSinkVid
         int recvPort = 50001;
         byte[] recvBuf = new byte[70000];
 
-        int currSeqNo = 0, recvLimit = 30000;
+        int currSeqNo = 0, recvLimit = 10000;
 
         try
         {
@@ -33,7 +33,7 @@ class TrafficSinkVid
 
             double currTime, packetRecvTime, timeDiff;
 
-            while(currSeqNo < recvLimit)
+            while(currSeqNo <= recvLimit)
             {
                 recvSocket.setSoTimeout(timeoutWindow);//receiver closes (milliseconds)
                 currTime = System.nanoTime();
