@@ -48,7 +48,7 @@ public class ReferenceTrafficSink {
 
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            long currTime = System.nanoTime();
+            long currTime = 0;
 
             Date startTime = cal.getTime();
             bfWriter.write(sdf.format(startTime));
@@ -60,9 +60,15 @@ public class ReferenceTrafficSink {
             byte[] buf = new byte[10000];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
+            long difference = 0;
             while(true){
                 serverSocket.receive(packet);
-                long difference = (System.nanoTime() - currTime)/1000000;
+                if(currTime == 0){
+                    difference = 0;
+                    currTime = System.nanoTime();
+                } else {
+                    difference = (System.nanoTime() - currTime)/1000000;
+                }
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                 int sequenceNumber = buffer.getInt();
                 if(sequenceNumber == 0){
