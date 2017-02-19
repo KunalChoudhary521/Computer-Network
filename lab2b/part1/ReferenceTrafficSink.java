@@ -61,6 +61,7 @@ public class ReferenceTrafficSink {
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
             long difference = 0;
+            long acumulatedTime = 0;
             while(true){
                 serverSocket.receive(packet);
                 if(currTime == 0){
@@ -69,13 +70,14 @@ public class ReferenceTrafficSink {
                 } else {
                     difference = (System.nanoTime() - currTime)/1000000;
                 }
+                acumulatedTime+= difference;
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                 int sequenceNumber = buffer.getInt();
                 if(sequenceNumber == 0){
                     System.out.println("Waiting...");
                 }
                 int sizeOfPacket = buffer.getInt();
-                String line = String.format("%-5s %-5s %-12s", sequenceNumber + 1, difference, sizeOfPacket);
+                String line = String.format("%-10s %-10s %-10s", sequenceNumber + 1, acumulatedTime, sizeOfPacket);
                 bfWriter.write(line);
                 bfWriter.newLine();
                 bfWriter.flush();

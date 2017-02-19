@@ -67,16 +67,17 @@ public class ReferenceTrafficGenerator{
             while(amountOfTimesSent < 10000){
                  long newTime = System.nanoTime();
                  long difference = (newTime - getCurrTime)/1000000;
-                 acumulatedTime+=difference;
                  if(amountOfTimesSent == 0){
+                     acumulatedTime += 0;
                      constantAmount = new byte[sizeOfPacket];
                      byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
                      for(int j = 0; j < integer.length; j++){
                          constantAmount[j] = integer[j];
                      }
-                     String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, 0, constantAmount.length);
+                     String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, 0, constantAmount.length);
                      DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
                      serverSocket.send(sendPacket);
+                     getCurrTime = System.nanoTime();
                      bfWriter.write(line);
                      bfWriter.newLine();
                      bfWriter.flush();
@@ -85,20 +86,20 @@ public class ReferenceTrafficGenerator{
                  } else if(difference >= transmissionInterval){
                      int bytesToSend = (int) Math.floor(difference/transmissionInterval);
                      for(int i = 0; i < bytesToSend*packets; i++) {
+                         acumulatedTime += (System.nanoTime() - getCurrTime)/1000000;
                          constantAmount = new byte[sizeOfPacket];
                          byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
                          for(int j = 0; j < integer.length; j++){
                                  constantAmount[j] = integer[j];
                          }
-                         String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, acumulatedTime, constantAmount.length);
+                         String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, acumulatedTime, constantAmount.length);
                          DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
                          serverSocket.send(sendPacket);
+                         getCurrTime = System.nanoTime();
                          bfWriter.write(line);
                          bfWriter.newLine();
                          bfWriter.flush();
                          amountOfTimesSent++;
-                         System.out.print("\033[H\033[2J");
-                         System.out.flush();
                          System.out.println(amountOfTimesSent);
                      }
                  }
