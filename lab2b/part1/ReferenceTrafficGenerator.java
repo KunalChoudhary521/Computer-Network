@@ -62,11 +62,13 @@ public class ReferenceTrafficGenerator{
             bfWriter.newLine();
             bfWriter.flush();
 
+            long acumulatedTime = 0;
+
             while(amountOfTimesSent < 10000){
                  long newTime = System.nanoTime();
                  long difference = (newTime - getCurrTime)/1000000;
+                 acumulatedTime+=difference;
                  if(amountOfTimesSent == 0){
-                     getCurrTime = System.nanoTime();
                      constantAmount = new byte[sizeOfPacket];
                      byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
                      for(int j = 0; j < integer.length; j++){
@@ -83,13 +85,12 @@ public class ReferenceTrafficGenerator{
                  } else if(difference >= transmissionInterval){
                      int bytesToSend = (int) Math.floor(difference/transmissionInterval);
                      for(int i = 0; i < bytesToSend*packets; i++) {
-                         getCurrTime = System.nanoTime();
                          constantAmount = new byte[sizeOfPacket];
                          byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
                          for(int j = 0; j < integer.length; j++){
                                  constantAmount[j] = integer[j];
                          }
-                         String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, difference, constantAmount.length);
+                         String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, acumulatedTime, constantAmount.length);
                          DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
                          serverSocket.send(sendPacket);
                          bfWriter.write(line);
