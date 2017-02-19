@@ -63,7 +63,6 @@ public class ReferenceTrafficSink {
             while(true){
                 serverSocket.receive(packet);
                 long difference = (System.nanoTime() - currTime)/1000000;
-                currTime = System.nanoTime();
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                 int sequenceNumber = buffer.getInt();
                 if(sequenceNumber == 0){
@@ -74,6 +73,7 @@ public class ReferenceTrafficSink {
                 bfWriter.write(line);
                 bfWriter.newLine();
                 bfWriter.flush();
+                currTime = System.nanoTime();
             }
 
         }

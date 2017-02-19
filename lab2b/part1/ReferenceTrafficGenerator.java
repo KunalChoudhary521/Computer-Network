@@ -66,35 +66,40 @@ public class ReferenceTrafficGenerator{
                  long newTime = System.nanoTime();
                  long difference = (newTime - getCurrTime)/1000000;
                  if(amountOfTimesSent == 0){
-                     constantAmount = new byte[packets * sizeOfPacket];
-                     byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(packets*sizeOfPacket).array();
-                     for(int i = 0; i < integer.length; i++){
-                         constantAmount[i] = integer[i];
+                     getCurrTime = System.nanoTime();
+                     constantAmount = new byte[sizeOfPacket];
+                     byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
+                     for(int j = 0; j < integer.length; j++){
+                         constantAmount[j] = integer[j];
                      }
                      String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, 0, constantAmount.length);
-                     System.out.println("Sending " + constantAmount.length + " bytes");
                      DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
                      serverSocket.send(sendPacket);
                      bfWriter.write(line);
                      bfWriter.newLine();
                      bfWriter.flush();
                      amountOfTimesSent++;
+                     System.out.println(amountOfTimesSent);
                  } else if(difference >= transmissionInterval){
-                     getCurrTime = newTime;
                      int bytesToSend = (int) Math.floor(difference/transmissionInterval);
-                     constantAmount = new byte[bytesToSend * packets * sizeOfPacket];
-                     byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(bytesToSend * packets * sizeOfPacket).array();
-                     for(int i = 0; i < integer.length; i++){
-                         constantAmount[i] = integer[i];
+                     for(int i = 0; i < bytesToSend*packets; i++) {
+                         getCurrTime = System.nanoTime();
+                         constantAmount = new byte[sizeOfPacket];
+                         byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
+                         for(int j = 0; j < integer.length; j++){
+                                 constantAmount[j] = integer[j];
+                         }
+                         String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, difference, constantAmount.length);
+                         DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
+                         serverSocket.send(sendPacket);
+                         bfWriter.write(line);
+                         bfWriter.newLine();
+                         bfWriter.flush();
+                         amountOfTimesSent++;
+                         System.out.print("\033[H\033[2J");
+                         System.out.flush();
+                         System.out.println(amountOfTimesSent);
                      }
-                     System.out.println("Sending " + constantAmount.length + " bytes");
-                     DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
-                     serverSocket.send(sendPacket);
-                     String line = String.format("%-5s %-5s %-12s", amountOfTimesSent + 1, difference, constantAmount.length);
-                     bfWriter.write(line);
-                     bfWriter.newLine();
-                     bfWriter.flush();
-                     amountOfTimesSent++;
                  }
             }
 
