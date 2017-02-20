@@ -53,8 +53,6 @@ public class ReferenceTrafficSink {
             Date startTime = cal.getTime();
             bfWriter.write(sdf.format(startTime));
             bfWriter.newLine();
-            bfWriter.write(""+currTime);
-            bfWriter.newLine();
             bfWriter.flush();
 
             byte[] buf = new byte[10000];
@@ -67,7 +65,9 @@ public class ReferenceTrafficSink {
                 if(currTime == 0){
                     difference = 0;
                     currTime = System.nanoTime();
-                } else {
+                    bfWriter.write(""+System.nanoTime());
+                    bfWriter.newLine();
+                } else{
                     difference = (System.nanoTime() - currTime)/1000000;
                 }
                 acumulatedTime+= difference;
