@@ -10,7 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-public class ReferenceTrafficSink {
+public class ReferenceTrafficSink implements Runnable {
 
     private String host;
     private int port;
@@ -40,15 +40,12 @@ public class ReferenceTrafficSink {
             bfWriter = new BufferedWriter(fos);
 
             int amountOfTimesReceived = 0;
-            long getCurrTime = System.nanoTime();
-
-            byte constantAmount[];
 
             DatagramSocket serverSocket = new DatagramSocket(port);
 
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            long currTime = 0;
+            long previous = 0;
 
             Date startTime = cal.getTime();
             bfWriter.write(sdf.format(startTime));
@@ -59,31 +56,27 @@ public class ReferenceTrafficSink {
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
             long difference = 0;
-            long acumulatedTime = 0;
             while(true){
                 serverSocket.receive(packet);
-                if(currTime == 0){
+                if(amountOfTimesReceived == 0){
                     difference = 0;
-                    currTime = System.nanoTime();
                     bfWriter.write(""+System.nanoTime());
                     bfWriter.newLine();
+                    amountOfTimesReceived++;
                 } else{
-                    difference = (System.nanoTime() - currTime)/1000000;
+                    amountOfTimesReceived++;
+                    difference = (System.nanoTime() - previous)/1000000;
                 }
-                acumulatedTime+= difference;
+                previous = System.nanoTime();
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                 int sequenceNumber = buffer.getInt();
-                if(sequenceNumber == 0){
-                    System.out.println("Waiting...");
-                }
+                System.out.println("Received "+amountOfTimesReceived+" packet(s)...");
                 int sizeOfPacket = buffer.getInt();
-                String line = String.format("%-10s %-10s %-10s", sequenceNumber + 1, acumulatedTime, sizeOfPacket);
+                String line = String.format("%-10s %-10s %-10s", sequenceNumber + 1, difference, sizeOfPacket);
                 bfWriter.write(line);
                 bfWriter.newLine();
                 bfWriter.flush();
-                currTime = System.nanoTime();
             }
-
         }
         catch (Exception ex)
         {
@@ -105,7 +98,7 @@ public class ReferenceTrafficSink {
     public static void main(String args[]){
         int port = Integer.parseInt(args[1]);
         String receiver = args[0];
-        String outFileName = args[2];
+        String outFileName = "traffic-sink.data";
 
         ReferenceTrafficSink generator = new ReferenceTrafficSink(receiver, port, outFileName);
 
@@ -113,4 +106,8 @@ public class ReferenceTrafficSink {
         generator.receiveTraffic();
     }
 
+    @Override
+    public void run() {
+        this.receiveTraffic();
+    }
 }

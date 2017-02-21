@@ -9,7 +9,7 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class ReferenceTrafficGenerator{
+public class ReferenceTrafficGenerator implements Runnable{
 
     private int transmissionInterval;
     private int packets;
@@ -31,14 +31,7 @@ public class ReferenceTrafficGenerator{
     }
 
     public void GenerateTraffic(){
-        BufferedReader bfReader = null;
         BufferedWriter bfWriter = null;
-
-        String currentLine;
-        StringTokenizer st = null;
-
-        long cumulatedArrivals = 0;
-
         try
         {
             InetAddress sendIP = InetAddress.getByName(receiver);
@@ -47,7 +40,8 @@ public class ReferenceTrafficGenerator{
             bfWriter = new BufferedWriter(fos);
 
             int amountOfTimesSent = 0;
-            long getCurrTime = System.nanoTime();
+            long getStartTime = System.nanoTime();
+            long getNewTime = System.nanoTime();
 
             byte constantAmount[];
 
@@ -58,17 +52,14 @@ public class ReferenceTrafficGenerator{
             Date startTime = cal.getTime();
             bfWriter.write(sdf.format(startTime));
             bfWriter.newLine();
-            bfWriter.write(""+getCurrTime);
+            bfWriter.write(""+getStartTime);
             bfWriter.newLine();
             bfWriter.flush();
 
-            long acumulatedTime = 0;
-
             while(amountOfTimesSent < 10000){
                  long newTime = System.nanoTime();
-                 long difference = (newTime - getCurrTime)/1000000;
+                 long difference = (newTime - getNewTime)/1000000;
                  if(amountOfTimesSent == 0){
-                     acumulatedTime += 0;
                      constantAmount = new byte[sizeOfPacket];
                      byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
                      for(int j = 0; j < integer.length; j++){
@@ -77,7 +68,7 @@ public class ReferenceTrafficGenerator{
                      String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, 0, constantAmount.length);
                      DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
                      serverSocket.send(sendPacket);
-                     getCurrTime = System.nanoTime();
+                     getNewTime = newTime;
                      bfWriter.write(line);
                      bfWriter.newLine();
                      bfWriter.flush();
@@ -85,17 +76,17 @@ public class ReferenceTrafficGenerator{
                      System.out.println(amountOfTimesSent);
                  } else if(difference >= transmissionInterval){
                      int bytesToSend = (int) Math.floor(difference/transmissionInterval);
-                     for(int i = 0; i < bytesToSend*packets; i++) {
-                         acumulatedTime += (System.nanoTime() - getCurrTime)/1000000;
+                     for(int i = 0; i < packets; i++) {
                          constantAmount = new byte[sizeOfPacket];
-                         byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
+                         byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent + 1).putInt(sizeOfPacket).array();
                          for(int j = 0; j < integer.length; j++){
                                  constantAmount[j] = integer[j];
                          }
-                         String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, acumulatedTime, constantAmount.length);
+                         String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, difference, constantAmount.length);
                          DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
                          serverSocket.send(sendPacket);
-                         getCurrTime = System.nanoTime();
+                         getNewTime = newTime;
+                         difference = (newTime - getNewTime)/1000000;
                          bfWriter.write(line);
                          bfWriter.newLine();
                          bfWriter.flush();
@@ -123,19 +114,27 @@ public class ReferenceTrafficGenerator{
     }
 
 
-    public static void main(String args[]){
-        int transmissionInterval = Integer.parseInt(args[0]);
-        int packets = Integer.parseInt(args[1]);
-        int sizeOfPacket = Integer.parseInt(args[2]);
-        int port = Integer.parseInt(args[3]);
-        String receiver = args[4];
-        int receiverPort = Integer.parseInt(args[5]);
-        String outFileName = args[6];
+    public static void main(String args[]) throws InterruptedException {
+        int transmissionInterval = 2;
+        int packets = 1;
+        int sizeOfPacket = 100;
+        int port = 8000;
+        String receiver = "localhost";
+        int receiverPort = 8001;
+        String outFileName = "traffic-gen.data";
+
+        System.out.println("Traffic Rate: " + (double)((1000/transmissionInterval)*packets*sizeOfPacket*8)/1000000 + "Mbps");
+
+        Thread.sleep(1000);
 
         ReferenceTrafficGenerator generator = new ReferenceTrafficGenerator(transmissionInterval, packets, sizeOfPacket
         , port, receiver, receiverPort, outFileName);
 
-        generator.GenerateTraffic();
+        new Thread(generator).start();
     }
 
+    @Override
+    public void run() {
+        this.GenerateTraffic();
+    }
 }
