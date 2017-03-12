@@ -55,14 +55,13 @@ public class TokenBucketReceiver implements Runnable
             FileOutputStream fOut =  new FileOutputStream(fileName);
             pOut = new PrintStream (fOut);
 
-            long startTime = 0;
-
             socket = new DatagramSocket(port);
 
             int received = 0;
 
             long previous = 0;
             long difference = 0;
+            int amountOfTimeReceived = 0;
 
             // receive and put packets in buffer (or send immediately)
             while (true)
@@ -71,28 +70,21 @@ public class TokenBucketReceiver implements Runnable
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
 
-				/*
-				 * Record arrival.
-				 * Elapsed time (microseconds), packet size (bytes), backlog (bytes), number of tokens (tokens).
-				 */
+                long currTime = System.nanoTime();
 
-				long currTime = System.nanoTime();
                 if(received == 0 ){
-                    pOut.println(currTime);
                     received++;
                     difference = 0;
                 } else {
-                    difference = (currTime - previous)/1000000;
+                    difference = (currTime - previous)/1000; //microsec
                 }
-
-                previous = System.nanoTime();
 
                 int noTokens = bucket.getNoTokens();
                 long bufferSize = buffer.getSizeInBytes();
-
-                String line = String.format("%-10s %-10s %-10s %-10s", difference, packet.getLength(), bufferSize, noTokens);
+                String line = String.format("%-10s %-10s %-10s %-10s %-10s", amountOfTimeReceived+1, difference, packet.getLength(), bufferSize, noTokens);
                 pOut.println(line);
-
+                previous = currTime;
+                amountOfTimeReceived += 1;
 				/*
 				 * Process packet.
 				 */

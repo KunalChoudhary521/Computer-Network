@@ -18,6 +18,8 @@ public class ReferenceTrafficGenerator implements Runnable{
     private String receiver;
     private String outFileName;
     private int receiverPort;
+    private PrintStream writer;
+    private FileOutputStream fout;
 
     public ReferenceTrafficGenerator(int transmissionInterval, int packets, int sizeOfPacket, int port, String receiver,
                                      int receiverPort, String outFileName){
@@ -35,67 +37,40 @@ public class ReferenceTrafficGenerator implements Runnable{
         try
         {
             InetAddress sendIP = InetAddress.getByName(receiver);
-            File fout = new File(outFileName);
-            FileWriter fos = new FileWriter(fout);
-            bfWriter = new BufferedWriter(fos);
+            fout = new FileOutputStream(outFileName);
+            writer = new PrintStream(fout);
 
             int amountOfTimesSent = 0;
-            long getStartTime = System.nanoTime();
-            long getNewTime = System.nanoTime();
-
-            byte constantAmount[];
 
             DatagramSocket serverSocket = new DatagramSocket(port);
 
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            Date startTime = cal.getTime();
-            bfWriter.write(sdf.format(startTime));
-            bfWriter.newLine();
-            bfWriter.write(""+getStartTime);
-            bfWriter.newLine();
-            bfWriter.flush();
+
+            long absTime = System.nanoTime();
+            long currTime = System.nanoTime();
+            long prevTime = 0;
 
             while(amountOfTimesSent < 10000){
-                 long newTime = System.nanoTime();
-                 long difference = (newTime - getNewTime)/1000000;
-                 if(amountOfTimesSent == 0){
-                     constantAmount = new byte[sizeOfPacket];
-                     byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent).putInt(sizeOfPacket).array();
-                     for(int j = 0; j < integer.length; j++){
-                         constantAmount[j] = integer[j];
-                     }
-                     String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, 0, constantAmount.length);
-                     DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
-                     serverSocket.send(sendPacket);
-                     getNewTime = newTime;
-                     bfWriter.write(line);
-                     bfWriter.newLine();
-                     bfWriter.flush();
-                     amountOfTimesSent++;
-                     System.out.println(amountOfTimesSent);
-                 } else if(difference >= transmissionInterval){
-                     int bytesToSend = (int) Math.floor(difference/transmissionInterval);
-                     for(int i = 0; i < packets; i++) {
-                         constantAmount = new byte[sizeOfPacket];
-                         byte[] integer =  ByteBuffer.allocate(8).putInt(amountOfTimesSent + 1).putInt(sizeOfPacket).array();
-                         for(int j = 0; j < integer.length; j++){
-                                 constantAmount[j] = integer[j];
+                 absTime = System.nanoTime();
+                 long difference = (absTime - prevTime)/1000; //microsec
+                 if(difference >= transmissionInterval) {
+                     byte[] data = new byte[sizeOfPacket];
+                     for (int i = 0; i < packets; i++) {
+                         currTime = System.nanoTime();
+                         if(amountOfTimesSent != 0) {
+                             difference = (currTime - prevTime) / 1000;
+                         } else {
+                             difference = 0;
                          }
-                         String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, difference, constantAmount.length);
-                         DatagramPacket sendPacket = new DatagramPacket(constantAmount, constantAmount.length, sendIP, receiverPort);
-                         serverSocket.send(sendPacket);
-                         getNewTime = newTime;
-                         difference = (newTime - getNewTime)/1000000;
-                         bfWriter.write(line);
-                         bfWriter.newLine();
-                         bfWriter.flush();
+                         DatagramPacket p = new DatagramPacket(data, data.length, sendIP, receiverPort);
+                         serverSocket.send(p);
+                         String line = String.format("%-10s %-10s %-10s", amountOfTimesSent + 1, difference, sizeOfPacket);
+                         writer.println(line);
+                         prevTime = currTime;
                          amountOfTimesSent++;
                          System.out.println(amountOfTimesSent);
                      }
                  }
             }
-
         }
         catch (Exception ex)
         {
@@ -115,15 +90,15 @@ public class ReferenceTrafficGenerator implements Runnable{
 
 
     public static void main(String args[]) throws InterruptedException {
-        int transmissionInterval = 2;
+        int transmissionInterval = 160; //microsec
         int packets = 1;
         int sizeOfPacket = 100;
         int port = 8000;
         String receiver = "localhost";
         int receiverPort = 8001;
-        String outFileName = "traffic-gen.data";
+        String outFileName = args[0];
 
-        System.out.println("Traffic Rate: " + (double)((1000/transmissionInterval)*packets*sizeOfPacket*8)/1000000 + "Mbps");
+        System.out.println("Traffic Rate: " + (double)((1000000/transmissionInterval)*packets*sizeOfPacket*8)/1000000 + "Mbps");
 
         Thread.sleep(1000);
 
