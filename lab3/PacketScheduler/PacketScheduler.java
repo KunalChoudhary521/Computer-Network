@@ -21,9 +21,9 @@ public class PacketScheduler implements Runnable
 	
 	/**	  
 	 * Constructor. Creates a buffers, receiver, and sender.
-	 * @param inPort Port on which to listen for packets.
+	 * @param inPort Port on which to listen for packets. (same as TrafficGenerator)
 	 * @param outAddress IP address to which packets are sent.
-	 * @param outPort Port to which packets are sent.
+	 * @param outPort Port to which packets are sent. (same as TrafficSink)
 	 * @param linkCapacity Capacity of output link (in bps).
 	 * @param numBuffer Number of buffers.
 	 * @param maxPacketSize Maximum size of packet that will be received.
