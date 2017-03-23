@@ -134,7 +134,7 @@ public class TrafficGenerator
 
         makeUdpPackets(inputFile,sendhost,sendPort, avgTRate);
 
-        //sendUdpPackets();
+        sendUdpPackets();
 
         printToFile(debugFile);//output SeqNo & Time to file (for debugging only)
     }
