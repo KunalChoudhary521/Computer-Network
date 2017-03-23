@@ -116,7 +116,7 @@ public class TrafficGenerator
     }
     public static void main (String[] args)
     {
-        String inputFile = "poisson3-25k.data", debugFile = "TGen.txt";
+        String inputFile = "poisson3.data", debugFile = "TGen.txt";
         pktList = new ArrayList<>();
         int sendPort = 5000;
 
@@ -134,7 +134,7 @@ public class TrafficGenerator
 
         makeUdpPackets(inputFile,sendhost,sendPort, avgTRate);
 
-        sendUdpPackets();
+        //sendUdpPackets();
 
         printToFile(debugFile);//output SeqNo & Time to file (for debugging only)
     }
