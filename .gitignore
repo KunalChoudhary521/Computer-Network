@@ -2,9 +2,8 @@
 
 *.iml
 **/.idea
+**/out/*
 
-*.txt
-*.data
 
 #lab2a ignores
 
