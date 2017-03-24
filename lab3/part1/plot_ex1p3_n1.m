@@ -5,7 +5,10 @@ clear all; clc;
 %elapsed time (microseconds), packet size (bytes), backlog in buffers ordered by 
 %index in array (bytes).
 
-[elapsed_time, packet_size, backlog] = textread('ps_ex1-3-N1.txt', '%f %f %f');
+schdfile = 'ps_ex1-3-N1.txt';
+sinkfile = 'TSinkOut_ex1-3-N1.txt';
+
+[elapsed_time, packet_size, backlog] = textread(schdfile, '%f %f %f');
 
 %%%%%%%%%%%%%%%%%%%%%%%Backlog as a Function of Time%%%%%%%%%%%%%%%%%%%%
 figure(1);
@@ -19,10 +22,11 @@ xlabel('Time (microseconds)');
 ylabel('Backlog (bytes)');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%Waiting Time%%%%%%%%%%%%%%%%%%%%%%
-[seq_num, arrival_time, sink_pkt_size] = textread('TSinkOut_ex1-3-N1.txt', '%f %f %f');
+
+[seq_num, arrival_time, sink_pkt_size] = textread(sinkfile, '%f %f %f');
 time_arrival = cumsum(arrival_time);
 
-%  waiting_time = zeros(1,size(elapsed_time,1));
+% waiting_time = zeros(1,size(elapsed_time,1));
 % i = 1;
 % while i <= size(elapsed_time,1)
 %     j = i;
