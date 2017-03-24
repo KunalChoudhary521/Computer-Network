@@ -49,8 +49,7 @@ public class TGenPos
                 payload[0] = (byte)priority;//poisson priority
 
                 pktList.add(new Packet(Integer.parseInt(col1),delay, Integer.parseInt(col3),
-                        new DatagramPacket(payload,
-                                Integer.parseInt(col3),sendIP,port)));
+                        new DatagramPacket(payload, Integer.parseInt(col3),sendIP,port)));
             }
 
             while((currentLine = bfReader.readLine()) != null)
@@ -67,9 +66,12 @@ public class TGenPos
                 delay = (nextTime - prevTime)/N;//re-scale values ex 1.1 (in ns)
                 prevTime = nextTime;
 
+                payload = new byte[frameSize];
+                payload[0] = (byte)priority;//poisson priority
+
                 //adds dataLine to the end of dataList
                 pktList.add(new Packet(SeqNo, delay, frameSize,
-                        new DatagramPacket(new byte[frameSize],frameSize,sendIP,port)));
+                        new DatagramPacket(payload,frameSize,sendIP,port)));
             }
         }
         catch (Exception ex)
@@ -113,7 +115,7 @@ public class TGenPos
 
                 sendSocket.send(pktList.get(i).udpPacket);
             }
-            System.out.println(i + " packets sent!");
+            System.out.println(i + " packets sent from Poisson Generator");
             sendSocket.close();
         }
         catch(IOException ex)

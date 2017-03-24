@@ -10,8 +10,8 @@ public class PrioritySch
         PacketScheduler ps = new PacketScheduler(5000,"localhost", 5001,
                 20000000,      //20 Mbps
                 2,              //2 FIFO buffer
-                1480,        //in bytes (from 2.1)
-                new long [] {100*1024},  //100kB bufferCapacity
+                1500,        //in bytes (from 2.1)
+                new long [] {100*1024, 100*1024},  //100kB bufferCapacity
                 "ps.txt");
 
 

@@ -19,7 +19,7 @@ class TrafficSinkPS
         PrintStream posTraffic = null;
         PrintStream vidTraffic = null;
 
-        int recvPort = 5000;//use same port as in TrafficGenerator.java, unless using PacketScheduler
+        int recvPort = 5001;//use same port as in TrafficGenerator.java, unless using PacketScheduler
         byte[] recvBuf = new byte[1500];
 
         int posSeqNo = 0, vidSeqNo = 0;

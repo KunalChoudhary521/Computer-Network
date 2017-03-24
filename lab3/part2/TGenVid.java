@@ -100,7 +100,7 @@ public class TGenVid
                 }
             }
 
-            System.out.println(packetsSent + " were sent from Generator");
+            System.out.println(packetsSent + " packets sent from Video Generator");
         }
     }
     public static ArrayList<DatagramPacket> fragmentPacket(int frameSize, InetAddress sinkIP, int sinkPort)
@@ -151,7 +151,7 @@ public class TGenVid
     }
     public static void main (String[] args)
     {
-        String inputFile = "movietrace.data", debugFile = "TGenVid.txt";
+        String inputFile = "movietrace-sm.data", debugFile = "TGenVid.txt";
 
         int sendPort = 5000;
 
