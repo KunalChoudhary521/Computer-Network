@@ -29,7 +29,7 @@ time_arrival = cumsum(arrival_time);
 %     while (((backlog(i) + packet_size(i)) > 102400) && j < size(elapsed_time,1))
 %         j = j+1;
 %     end
-%     waiting_time(i) = abs(time_arrival(i) - time_depart(j));
+%     waiting_time(i) = abs(time_depart(i) - time_arrival(j));
 %     i = i + 1;
 % end
 % 
