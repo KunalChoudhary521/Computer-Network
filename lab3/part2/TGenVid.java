@@ -15,6 +15,7 @@ public class TGenVid
     public static final int priority = 2;
     public static final int maxFSize = 1480;//any packet more than this is fragmented
     public static int packetsSent = 0;
+    public static int bytesSent = 0;
 
     public static void readPackets(String inFile, String recvHost, int port, String dbgFile)
     {
@@ -63,7 +64,7 @@ public class TGenVid
                 if(frameSize > maxFSize)
                 {
                     packetList = fragmentPacket(frameSize,sendIP, port);
-                    sendUdpPacket(packetList,(100.0/3.0));
+                    //sendUdpPacket(packetList,(100.0/3.0));
                 }
                 else//no fragmentation needed
                 {
@@ -72,16 +73,19 @@ public class TGenVid
 
                     packetList = new ArrayList<>();
                     packetList.add(new DatagramPacket(payload,frameSize,sendIP,port));
-                    sendUdpPacket(packetList,(100.0/3.0));
+                    //sendUdpPacket(packetList,(100.0/3.0));
                 }
+
+                sendUdpPacket(packetList,(100.0/3.0));//send the packet fragments
 
                 for (int i = 0; i < packetList.size(); i++)
                 {
                     debugOut.printf("%-7s %-10.3f %s\n", packetsSent,(100.0/3.0),
                             packetList.get(i).getLength());
                     packetsSent++;
+                    bytesSent += packetList.get(i).getLength();
                 }
-                //packetsSent += packetList.size();
+
             }
         }
         catch (Exception ex)
@@ -100,7 +104,8 @@ public class TGenVid
                 }
             }
 
-            System.out.println(packetsSent + " packets sent from Video Generator");
+            System.out.println(packetsSent + " packets" + " and "
+                            + bytesSent + " bytes sent from Video Generator");
         }
     }
     public static ArrayList<DatagramPacket> fragmentPacket(int frameSize, InetAddress sinkIP, int sinkPort)
