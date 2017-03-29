@@ -43,8 +43,8 @@ ylim([0  max(waiting_time)*1.2]);
 discarded_packets = zeros(1,size(elapsed_time,1));
 i = 1;
 
-while  i <= size(sink_pkt_size,1)
-    if((backlog(i) + sink_pkt_size(i)) > 102400)
+while  i <= size(packet_size,1)
+    if((backlog(i) + packet_size(i)) > 102400)
         discarded_packets(i) = 1;
     end
     i = i + 1;
@@ -55,6 +55,8 @@ plot(time_depart, cumsum(discarded_packets));
 title('Discarded Packets for N = 5');
 xlabel('Time (microseconds)');
 ylabel('# of Packets');
+ylim([0  max(cumsum(discarded_packets))*1.2]);
+xlim([0  max(time_depart)*1.02]);
 
 %these packets sum to 100*1024: sum(packet_size(1:1016),1) (at this point
 %buffer overflows
