@@ -1,6 +1,6 @@
 package part2;
 
-import PacketScheduler.PacketScheduler;
+import part2.PacketScheduler.PacketScheduler;
 
 public class PrioritySch
 {
