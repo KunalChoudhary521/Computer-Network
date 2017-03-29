@@ -17,6 +17,7 @@ public class Queue {
         queue = new ArrayList<DatagramPacket>();
         this.capacity = capacity;
         this.weight = weight;
+        currSize = 0;
     }
 
     //FIFO queue means that packets are always added to the end of an ArrayList

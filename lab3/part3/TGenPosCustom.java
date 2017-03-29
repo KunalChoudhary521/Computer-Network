@@ -14,21 +14,23 @@ import java.util.StringTokenizer;
 */
 public class TGenPosCustom implements Runnable
 {
-    public static ArrayList<Packet> pktList;
-    public static final int priority = 1;
+    public ArrayList<Packet> pktList;
+    private int priority;
 
     String inFile;
     String recvHost;
     int port;
     int N;
+    boolean canSend = false;
     String outFile;
 
-    public TGenPosCustom(String inFile, String recvHost, int port, int N, String outFile){
+    public TGenPosCustom(String inFile, String recvHost, int port, int N, String outFile, int priority){
         this.inFile = inFile;
         this.recvHost = recvHost;
         this.port = port;
         this.N = N;
         this.outFile = outFile;
+        this.priority = priority;
     }
 
 
@@ -49,6 +51,7 @@ public class TGenPosCustom implements Runnable
             int SeqNo, frameSize, prevTime = 0, nextTime, delay;
 
             byte[] payload = null;
+            int count = 1;
 
             //first packet is transmitted without a delay
             if((currentLine = bfReader.readLine()) != null)
@@ -69,7 +72,7 @@ public class TGenPosCustom implements Runnable
                         new DatagramPacket(payload, Integer.parseInt(col3),sendIP,port)));
             }
 
-            while((currentLine = bfReader.readLine()) != null)
+            while((currentLine = bfReader.readLine()) != null && count < 30001)
             {
                 st = new StringTokenizer(currentLine);
                 col1 = st.nextToken();//sequence number
@@ -89,7 +92,9 @@ public class TGenPosCustom implements Runnable
                 //adds dataLine to the end of dataList
                 pktList.add(new Packet(SeqNo, delay, frameSize,
                         new DatagramPacket(payload,frameSize,sendIP,port)));
+                count++;
             }
+            canSend = true;
         }
         catch (Exception ex)
         {
@@ -108,7 +113,7 @@ public class TGenPosCustom implements Runnable
             }
         }
     }
-    public void sendUdpPackets()
+    private void sendUdpPackets()
     {
         try {
             DatagramSocket sendSocket = new DatagramSocket();
@@ -147,12 +152,14 @@ public class TGenPosCustom implements Runnable
 
         makeUdpPackets();
 
+        while(!canSend){}
+
         sendUdpPackets();
 
         printToFile(outFile);//output SeqNo & Time to file (for debugging only)
     }
 
-    public static void printToFile(String dbgFile)
+    private void printToFile(String dbgFile)
     {
         PrintStream debugOut = null;
         try
