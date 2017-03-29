@@ -1,6 +1,6 @@
 package part1;
 
-import PacketScheduler.PacketScheduler;
+import part1.PacketScheduler.PacketScheduler;
 
 public class FIFOSch
 {

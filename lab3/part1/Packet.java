@@ -1,6 +1,5 @@
 package part1;
 
-
 import java.net.DatagramPacket;
 
 public class Packet
