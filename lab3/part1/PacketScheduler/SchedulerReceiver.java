@@ -74,7 +74,7 @@ public class SchedulerReceiver implements Runnable
 					long bufferSize = buffers[i].getSizeInBytes();
 					pOut.print(bufferSize + "\t");
 				}
-				pOut.println();
+				//pOut.println();
 				previsuTime = startTime;
 				
 				/*
@@ -82,10 +82,24 @@ public class SchedulerReceiver implements Runnable
 				 */
 				
 				// add packet to a queue if there is enough space
-				if (buffers[0].addPacket(new DatagramPacket(packet.getData(), packet.getLength())) < 0)
+				if (packet.getData() [0] == (byte) 1)//poisson traffic (low priority)
 				{
-					System.err.println("Packet dropped (queue full).");
+					pOut.print(1);
+					if (buffers[0].addPacket(new DatagramPacket(packet.getData(), packet.getLength())) < 0)
+					{
+						System.err.println("Packet dropped (queue 1 full).");
+					}
 				}
+				else if (packet.getData() [0] == (byte) 2)//video traffic (high priority)
+				{
+					pOut.print(2);
+					if (buffers[1].addPacket(new DatagramPacket(packet.getData(), packet.getLength())) < 0)
+					{
+						System.err.println("Packet dropped (queue 2 full).");
+					}
+				}
+
+				pOut.println();
 				/*
 				 * TODO: 
 				 * Replace previous command with code that:

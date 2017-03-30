@@ -67,7 +67,6 @@ public class SchedulerReceiver implements Runnable
 				if(previsuTime == 0)
 				{
 					previsuTime = startTime;
-					//System.out.println(startTime);
 				}
 				pOut.print((startTime-previsuTime)/1000 + "\t" + packet.getLength() + "\t");
 				for (int i = 0; i<buffers.length; i++)
