@@ -1,4 +1,0 @@
-1	for part1, do we need to send 125k packets? 50k or 25k enough?
-2	for part2, is maxPacketSize=1480bytes for PrioritySch?
-3	for part2, do we need to send all movietraace packets?
-4	for part2, is there only 1 traffic sink?
