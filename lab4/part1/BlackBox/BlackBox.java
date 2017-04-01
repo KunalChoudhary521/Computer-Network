@@ -41,7 +41,7 @@ public class BlackBox implements Runnable
 		/**
 		 * Constant traffic delay (in micro seconds).
 		 */
-		int TConstant = 1000;//0
+		int TConstant = 0;//0
 		
 		/**
 		 * Port number on which BlackBox listens for incoming traffic.
