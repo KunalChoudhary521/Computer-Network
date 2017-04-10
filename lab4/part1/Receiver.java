@@ -33,26 +33,23 @@ public class Receiver extends Thread
             byte[] recvBuf = new byte[this.maxpktSize];
             DatagramPacket recvdPacket = new DatagramPacket(recvBuf,recvBuf.length);
 
-            int timeoutWindow = 3000;//in ms
+            int timeoutWindow = 2000;//in ms
             System.out.println("Receiver times out in " + timeoutWindow + "ms ...");
 
-            long currTime, timeDiff, prevTime = System.nanoTime() / 1000;
-            while(true)//keep accepting packets until TrafficSink times-out
+            long currTime, startTime = System.nanoTime() / 1000;
+            while(true)//keep accepting packets until Receiver times-out
             {
                 recvSocket.setSoTimeout(timeoutWindow);//receiver closes (milliseconds)
                 recvSocket.receive(recvdPacket);
 
                 currTime = System.nanoTime() / 1000;//time after getting the packet
 
-                timeDiff = (currTime - prevTime);
-                prevTime = currTime;
-
                 //extract port & sequence numbers
-                int portNum = fromByteArray(recvdPacket.getData(),0,2);
+                //int portNum = fromByteArray(recvdPacket.getData(),0,2);
                 int currSeqNo = fromByteArray(recvdPacket.getData(),2,4);
 
 
-                this.rcvTS[currSeqNo-1].setRecvTime(currSeqNo,currTime);
+                this.rcvTS[currSeqNo-1].setRecvTime(currSeqNo,currTime - startTime);
 
                 printPacket.printf("%-7s %-10s %s\n",
                         rcvTS[currSeqNo-1].seqNo, rcvTS[currSeqNo-1].sendTime, rcvTS[currSeqNo-1].recvTime);

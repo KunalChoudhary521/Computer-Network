@@ -1,9 +1,7 @@
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
     Usage:
-    java Estimator [blackboxIP] [bloackBoxPort] [numPackets] [packetTrainSize] [rate]
+    java Estimator [blackboxIP] [bloackBoxPort] [N] [L] [r]
 */
 
 public class Estimator
@@ -34,19 +32,7 @@ public class Estimator
             new Receiver(tsKeeper, receiverPort, 2048).start();
 
             new Sender(tsKeeper,blackBoxIP,blackBoxPort,receiverPort,
-                    numPackets,packetTrainSize,rate).readPackets();//sender thread
-
-            //normalize timestamps
-
-            /*
-            PrintStream printPacket = new PrintStream(new FileOutputStream(fileOutput));
-
-            for (int i = 0; i < tsKeeper.length; i++)
-            {
-                printPacket.printf("%-7s %-10s %s\n",
-                        tsKeeper[i].seqNo, tsKeeper[i].sendTime, tsKeeper[i].recvTime);
-            }
-            */
+                    numPackets,packetTrainSize,rate).start();//sender thread
 
         }
         catch (Exception ex)

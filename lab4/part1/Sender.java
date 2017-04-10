@@ -1,10 +1,6 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.StringTokenizer;
 
 /**
     Sender (not the Estimator) decides the # of packets,
@@ -36,73 +32,67 @@ public class Sender extends Thread
 
     public void run()
     {
-        readPackets();
+        sendUdpPacket();
     }
 
-    public void readPackets()
+    public void sendUdpPacket()
     {
-        int seqNo;
-        try
-        {
-            int pktsize = this.packetTrainSize/this.numPackets;//in bytes
-            long delayInMus = (pktsize * 1_000_000) / ((this.rate * 1000)/8) ;//micro-sec
+        int pktsize = this.packetTrainSize/this.numPackets;//in bytes
+        long delayInMus = (pktsize * 1_000_000) / ((this.rate * 1000)/8) ;//micro-sec
 
-            System.out.println(pktsize + " Bytes per packet\n" +
-                    delayInMus + " micro-sec transmission time between packets\n" +
-                               this.numPackets + " packets to send" );
+        System.out.println(pktsize + " Bytes per packet\n" +
+                delayInMus + " micro-sec transmission time between packets\n" +
+                this.numPackets + " packets to send" );
 
-            for (seqNo = 1; seqNo <= this.numPackets; seqNo++)
-            {
-                sendUdpPacket(seqNo,pktsize,delayInMus);
-            }
+        long startTime = (System.nanoTime() / 1000), currTime = 0, sendTime;
 
-            System.out.println(seqNo-1 + " packets sent to BlackBox");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+        byte[] payload, portByteArray, seqNumByteArray;
+        InetAddress bBoxIP;
 
-    }
-    public void sendUdpPacket(int seqNum, int packetSize, long delay)
-    {
-        long sendTime, currTime;
+        DatagramSocket sendSocket;
+
+        int seqNum;
 
         try
         {
-            byte[] payload = new byte[packetSize+4+4];//+4 for seqNo & receiverPort
+            bBoxIP = InetAddress.getByName(this.blackBoxIP);
 
-            byte[] portByteArray = toByteArray(this.receiverPort);
-            System.arraycopy(portByteArray,2,payload,0,2);//set receiverPort
-
-            byte[] seqNumByteArray = toByteArray(seqNum);
-            System.arraycopy(seqNumByteArray,0,payload,2,seqNumByteArray.length);//set seqNum
-
-            DatagramSocket sendSocket = new DatagramSocket();
-            InetAddress bBoxIP = InetAddress.getByName(this.blackBoxIP);
-            DatagramPacket packet = new DatagramPacket(payload,payload.length,bBoxIP, this.blackBoxPort);
-
-
-            //record sendTime
-
-            sendTime = (System.nanoTime()/1000) + delay;
-            if(seqNum == 1)
+            for (seqNum = 1; seqNum <= this.numPackets; seqNum++)
             {
-                this.sndTS[seqNum-1].setSendTime(seqNum,sendTime);//(seqNum-1) => seqNum start from 1
+                sendSocket = new DatagramSocket();
+                payload = new byte[pktsize + 4 + 4];//+4 for seqNo & receiverPort
+
+                portByteArray = toByteArray(this.receiverPort);
+                System.arraycopy(portByteArray, 2, payload, 0, 2);//set receiverPort
+
+                seqNumByteArray = toByteArray(seqNum);
+                System.arraycopy(seqNumByteArray, 0, payload, 2, seqNumByteArray.length);//set seqNum
+
+
+                DatagramPacket packet = new DatagramPacket(payload, payload.length, bBoxIP, this.blackBoxPort);
+
+
+                if (seqNum == 1) {
+                    this.sndTS[seqNum - 1].setSendTime(seqNum, 0);//(seqNum-1) => seqNum start from 1
+                }
+                else {
+                    this.sndTS[seqNum - 1].setSendTime(seqNum,
+                            currTime - startTime);//(seqNum-1) => seqNum start from 1
+                }
+
+                //record sendTime
+                sendTime = (System.nanoTime() / 1000) + delayInMus;
+                do {
+                    currTime = System.nanoTime() / 1000;//micro-sec
+                } while (currTime < sendTime);//busy wait to create delay
+
+
+
+                sendSocket.send(packet);
+                sendSocket.close();
             }
-            else
-            {
-                this.sndTS[seqNum-1].setSendTime(seqNum,sendTime);//(seqNum-1) => seqNum start from 1
-            }
 
-
-            do
-            {
-                currTime = System.nanoTime()/1000;//micro-sec
-            }while (currTime < sendTime);//busy wait to create fake delay
-
-            sendSocket.send(packet);
-            sendSocket.close();
+            System.out.println(seqNum-1 + " packets sent to BlackBox");
         }
         catch (Exception ex)
         {
