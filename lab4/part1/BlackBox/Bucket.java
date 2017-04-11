@@ -1,4 +1,4 @@
-package BlackBox;
+package part1.BlackBox;
 
 /**
  * Token generator and bucket to store generated tokens.

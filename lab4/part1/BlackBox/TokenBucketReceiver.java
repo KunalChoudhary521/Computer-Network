@@ -1,4 +1,4 @@
-package BlackBox;
+package part1.BlackBox;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

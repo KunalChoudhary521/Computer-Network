@@ -1,4 +1,4 @@
-package BlackBox;
+package part1.BlackBox;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

@@ -1,4 +1,4 @@
-package BlackBox;
+package part1.BlackBox;
 
 /**
  * BlackBox is a network element that applies the shaping policy.
