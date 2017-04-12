@@ -1,3 +1,7 @@
+package part1;
+
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 /**
     Usage:
@@ -9,7 +13,7 @@ public class Estimator
 
     public static void main(String[] args)
     {
-        String blackBoxIP, fileOutput = "Estimator.txt";
+        String blackBoxIP, fileOutput = "TimeStamps.txt";
         int blackBoxPort, receiverPort;
         int numPackets, packetTrainSize, rate;
 
@@ -29,10 +33,28 @@ public class Estimator
 
             receiverPort = 5001;//BlackBox sends packets to this port
 
-            new Receiver(tsKeeper, receiverPort, 2048).start();
+            Thread recvThread = new Receiver(tsKeeper, receiverPort, 2048,fileOutput);
+            recvThread.start();
 
-            new Sender(tsKeeper,blackBoxIP,blackBoxPort,receiverPort,
-                    numPackets,packetTrainSize,rate).start();//sender thread
+            Thread sendThread = new Sender(tsKeeper,blackBoxIP,blackBoxPort,receiverPort,
+                    numPackets,packetTrainSize,rate);//sender thread
+            sendThread.start();
+
+            sendThread.join();
+            recvThread.join();
+
+
+
+            //Normalized Timestamps to the Send Timestamp of 1st packet, whose timestamp should be zero.
+            PrintStream normPacket = new PrintStream(new FileOutputStream(fileOutput));
+            for(int i = 0; i < tsKeeper.length; i++)
+            {
+                normPacket.printf("%-7s %-10s %s\n",
+                        tsKeeper[i].seqNo, tsKeeper[i].sendTime - tsKeeper[0].sendTime,
+                        tsKeeper[i].recvTime - tsKeeper[0].sendTime);
+            }
+
+            System.out.println("Sender & Receiver threads finished");
 
         }
         catch (Exception ex)

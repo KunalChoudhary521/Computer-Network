@@ -1,3 +1,4 @@
+package part1;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.DatagramPacket;
@@ -9,13 +10,13 @@ public class Receiver extends Thread
     int receiverPort, maxpktSize;
     public Timestamp[] rcvTS;
 
-    public Receiver(Timestamp[] ts ,int recvPort, int maxpktSize)
+    public Receiver(Timestamp[] ts ,int recvPort, int maxpktSize, String file)
     {
         this.rcvTS = ts;
         this.receiverPort = recvPort;
         this.maxpktSize = maxpktSize;
 
-        this.fileOutput = "EstimatedTime.txt";
+        this.fileOutput = file;
     }
 
     public void run()
@@ -28,15 +29,15 @@ public class Receiver extends Thread
         try
         {
             DatagramSocket recvSocket = new DatagramSocket(this.receiverPort);
-            PrintStream printPacket = new PrintStream(new FileOutputStream(fileOutput));
+            //PrintStream printPacket = new PrintStream(new FileOutputStream(fileOutput));
 
             byte[] recvBuf = new byte[this.maxpktSize];
             DatagramPacket recvdPacket = new DatagramPacket(recvBuf,recvBuf.length);
 
-            int timeoutWindow = 2000;//in ms
+            int timeoutWindow = 3000;//in ms
             System.out.println("Receiver times out in " + timeoutWindow + "ms ...");
 
-            long currTime, startTime = System.nanoTime() / 1000;
+            long currTime;
             while(true)//keep accepting packets until Receiver times-out
             {
                 recvSocket.setSoTimeout(timeoutWindow);//receiver closes (milliseconds)
@@ -49,10 +50,9 @@ public class Receiver extends Thread
                 int currSeqNo = fromByteArray(recvdPacket.getData(),2,4);
 
 
-                this.rcvTS[currSeqNo-1].setRecvTime(currSeqNo,currTime - startTime);
+                this.rcvTS[currSeqNo-1].setRecvTime(currSeqNo,currTime - Timestamp.getStartTime());
 
-                printPacket.printf("%-7s %-10s %s\n",
-                        rcvTS[currSeqNo-1].seqNo, rcvTS[currSeqNo-1].sendTime, rcvTS[currSeqNo-1].recvTime);
+                //printPacket.printf("%-7s %-10s %s\n",rcvTS[currSeqNo-1].seqNo, rcvTS[currSeqNo-1].sendTime, rcvTS[currSeqNo-1].recvTime);
             }
 
         }

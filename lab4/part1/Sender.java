@@ -1,3 +1,4 @@
+package part1;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -38,13 +39,13 @@ public class Sender extends Thread
     public void sendUdpPacket()
     {
         int pktsize = this.packetTrainSize/this.numPackets;//in bytes
-        long delayInMus = (pktsize * 1_000_000) / ((this.rate * 1000)/8) ;//micro-sec
+        long delayInMus = ((pktsize * 1_000_000) / ((this.rate * 1000)/8)) ;//micro-sec
 
         System.out.println(pktsize + " Bytes per packet\n" +
                 delayInMus + " micro-sec transmission time between packets\n" +
                 this.numPackets + " packets to send" );
 
-        long startTime = (System.nanoTime() / 1000), currTime = 0, sendTime;
+        long currTime = 0, sendTime;
 
         byte[] payload, portByteArray, seqNumByteArray;
         InetAddress bBoxIP;
@@ -56,6 +57,8 @@ public class Sender extends Thread
         try
         {
             bBoxIP = InetAddress.getByName(this.blackBoxIP);
+
+            Timestamp.setStartTime();
 
             for (seqNum = 1; seqNum <= this.numPackets; seqNum++)
             {
@@ -72,20 +75,14 @@ public class Sender extends Thread
                 DatagramPacket packet = new DatagramPacket(payload, payload.length, bBoxIP, this.blackBoxPort);
 
 
-                if (seqNum == 1) {
-                    this.sndTS[seqNum - 1].setSendTime(seqNum, 0);//(seqNum-1) => seqNum start from 1
-                }
-                else {
-                    this.sndTS[seqNum - 1].setSendTime(seqNum,
-                            currTime - startTime);//(seqNum-1) => seqNum start from 1
-                }
-
                 //record sendTime
                 sendTime = (System.nanoTime() / 1000) + delayInMus;
                 do {
                     currTime = System.nanoTime() / 1000;//micro-sec
                 } while (currTime < sendTime);//busy wait to create delay
 
+                this.sndTS[seqNum - 1].setSendTime(seqNum,
+                        currTime - Timestamp.getStartTime());//(seqNum-1) => seqNum start from 1
 
 
                 sendSocket.send(packet);
