@@ -5,7 +5,7 @@ import java.io.PrintStream;
 
 /**
     Usage:
-    java Estimator [blackboxIP] [bloackBoxPort] [N] [L] [r]
+    java Estimator [blackboxIP] [blackBoxPort] [N] [L] [r]
 */
 
 public class Estimator
